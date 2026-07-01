@@ -27,7 +27,7 @@ Live site: https://lotostradamus-e09e6.web.app
 - `predictions` — `{ date (ISO string), numeros (5 ints), chance (int), evalue (bool), nbrMatch (int), chanceMatch (bool) }`
 - `tirages` — `{ date (ISO string), numeros (5 ints), chance (int) }`
 
-**Evaluation flow:** predictions are created with `evalue: false`. When a draw is saved (`form-tirage`), the handler reads *all* predictions and, for each unevaluated one, computes `nbrMatch` (count of matching numbers) and `chanceMatch`, then sets `evalue: true`. A prediction counts as a "réussite" if `nbrMatch > 0 || chanceMatch`.
+**Evaluation flow:** predictions are created with `evalue: false`. `evaluerPronostics()` indexes draws by day (`date.slice(0,10)`) and, for each unevaluated prediction, evaluates it against the draw with the **same date** (if one exists) — computing `nbrMatch` (count of matching numbers) and `chanceMatch`, then setting `evalue: true`. It runs after both submitting a prediction and saving a draw, so evaluation happens regardless of which was entered first. A prediction counts as a "réussite" if `nbrMatch > 0 || chanceMatch`.
 
 **Rendering:** `chargerPronostics()`, `chargerTirages()`, and `chargerStats()` each read their collection, sort newest-first client-side, and write HTML into a container div. They are called on load and re-called after the relevant form submits. Dates are stored as ISO strings and displayed with `toLocaleDateString()`.
 

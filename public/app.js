@@ -73,6 +73,9 @@ formPronostic.addEventListener("submit", async (e) => {
       nbrMatch: 0,
       chanceMatch: false
     });
+    // Évaluer tout de suite si un tirage de la même date existe déjà
+    await evaluerPronostics();
+
     alert("Pronostic enregistré avec succès !");
     formPronostic.reset();
     chargerStats();
@@ -103,24 +106,8 @@ formTirage.addEventListener("submit", async (e) => {
       chance: tirageChance
     });
 
-    // Étape B : Évaluer tous les pronostics non encore évalués
-    const querySnapshot = await getDocs(collection(db, "predictions"));
-    querySnapshot.forEach(async (documentSnapshot) => {
-      const data = documentSnapshot.data();
-      if (!data.evalue) {
-        // Compter les correspondances
-        const nbrMatch = data.numeros.filter(num => tirageNumeros.includes(num)).length;
-        const chanceMatch = (data.chance === tirageChance);
-
-        // Mettre à jour la prédiction
-        const predictionRef = doc(db, "predictions", documentSnapshot.id);
-        await updateDoc(predictionRef, {
-          evalue: true,
-          nbrMatch: nbrMatch,
-          chanceMatch: chanceMatch
-        });
-      }
-    });
+    // Étape B : Évaluer les pronostics contre les tirages de même date
+    await evaluerPronostics();
 
     alert("Tirage enregistré et pronostics mis à jour !");
     formTirage.reset();
@@ -131,6 +118,42 @@ formTirage.addEventListener("submit", async (e) => {
     console.error("Erreur lors de l'évaluation : ", error);
   }
 });
+
+// Évalue les pronostics non encore évalués contre le tirage de MÊME date
+async function evaluerPronostics() {
+  const [tiragesSnap, predictionsSnap] = await Promise.all([
+    getDocs(collection(db, "tirages")),
+    getDocs(collection(db, "predictions")),
+  ]);
+
+  // Indexer les tirages par jour (AAAA-MM-JJ)
+  const tiragesParJour = {};
+  tiragesSnap.forEach((d) => {
+    const t = d.data();
+    tiragesParJour[t.date.slice(0, 10)] = t;
+  });
+
+  // Pour chaque pronostic en attente, chercher le tirage du même jour
+  const misesAJour = [];
+  predictionsSnap.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.evalue) return;
+
+    const tirage = tiragesParJour[data.date.slice(0, 10)];
+    if (!tirage) return; // pas encore de tirage pour cette date
+
+    const nbrMatch = data.numeros.filter((num) => tirage.numeros.includes(num)).length;
+    const chanceMatch = (data.chance === tirage.chance);
+
+    misesAJour.push(updateDoc(doc(db, "predictions", docSnap.id), {
+      evalue: true,
+      nbrMatch,
+      chanceMatch,
+    }));
+  });
+
+  await Promise.all(misesAJour);
+}
 
 // 3. Calculer les statistiques et afficher l'historique
 async function chargerStats() {
