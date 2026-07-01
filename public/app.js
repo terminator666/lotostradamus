@@ -75,6 +75,7 @@ formPronostic.addEventListener("submit", async (e) => {
     alert("Pronostic enregistré avec succès !");
     formPronostic.reset();
     chargerStats();
+    chargerPronostics();
   } catch (error) {
     console.error("Erreur lors de l'enregistrement : ", error);
   }
@@ -122,6 +123,7 @@ formTirage.addEventListener("submit", async (e) => {
     alert("Tirage enregistré et pronostics mis à jour !");
     formTirage.reset();
     chargerStats();
+    chargerPronostics();
   } catch (error) {
     console.error("Erreur lors de l'évaluation : ", error);
   }
@@ -159,5 +161,37 @@ async function chargerStats() {
   }
 }
 
+// Afficher tous les pronostics enregistrés (évalués et en attente)
+async function chargerPronostics() {
+  const querySnapshot = await getDocs(collection(db, "predictions"));
+
+  // Trier du plus récent au plus ancien
+  const pronostics = querySnapshot.docs
+    .map((d) => d.data())
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (pronostics.length === 0) {
+    document.getElementById("liste-pronostics").innerHTML = "<p>Aucun pronostic enregistré pour l'instant.</p>";
+    return;
+  }
+
+  let html = "<ul>";
+  pronostics.forEach((data) => {
+    let statut;
+    if (!data.evalue) {
+      statut = "⏳ En attente d'un tirage";
+    } else {
+      const estGagnant = data.nbrMatch > 0 || data.chanceMatch;
+      statut = `${estGagnant ? "✅" : "❌"} ${data.nbrMatch} numéro(s) + ${data.chanceMatch ? "chance trouvée" : "chance manquée"}`;
+    }
+    html += `<li>Pronostic du ${new Date(data.date).toLocaleDateString()} :
+      [${data.numeros.join(", ")}] (Chance: ${data.chance}) — <strong>${statut}</strong></li>`;
+  });
+  html += "</ul>";
+
+  document.getElementById("liste-pronostics").innerHTML = html;
+}
+
 // Chargement initial
 chargerStats();
+chargerPronostics();
