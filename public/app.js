@@ -62,10 +62,11 @@ formPronostic.addEventListener("submit", async (e) => {
     parseInt(document.getElementById("p5").value),
   ];
   const chance = parseInt(document.getElementById("pc").value);
+  const date = new Date(document.getElementById("p-date").value).toISOString();
 
   try {
     await addDoc(collection(db, "predictions"), {
-      date: new Date().toISOString(),
+      date,
       numeros,
       chance,
       evalue: false,
@@ -92,11 +93,12 @@ formTirage.addEventListener("submit", async (e) => {
     parseInt(document.getElementById("t5").value),
   ];
   const tirageChance = parseInt(document.getElementById("tc").value);
+  const tirageDate = new Date(document.getElementById("t-date").value).toISOString();
 
   try {
     // Étape A : Enregistrer le tirage
     await addDoc(collection(db, "tirages"), {
-      date: new Date().toISOString(),
+      date: tirageDate,
       numeros: tirageNumeros,
       chance: tirageChance
     });
@@ -199,6 +201,11 @@ async function chargerPronostics() {
 
   document.getElementById("liste-pronostics").innerHTML = html;
 }
+
+// Pré-remplir les champs date avec la date du jour (format AAAA-MM-JJ)
+const aujourdhui = new Date().toISOString().slice(0, 10);
+document.getElementById("p-date").value = aujourdhui;
+document.getElementById("t-date").value = aujourdhui;
 
 // Chargement initial
 chargerStats();

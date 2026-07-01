@@ -44,6 +44,8 @@
     <h2>1. Enregistrer un Pronostic</h2>
     <form id="form-pronostic">
       <p>Saisissez vos 5 numéros (1-49) et le numéro Chance (1-10) :</p>
+      <p><label for="p-date">Date du pronostic : </label>
+        <input type="date" id="p-date" style="width: auto;" required></p>
       <input type="number" id="p1" min="1" max="49" required>
       <input type="number" id="p2" min="1" max="49" required>
       <input type="number" id="p3" min="1" max="49" required>
@@ -60,6 +62,8 @@
     <h2>2. Enregistrer le Tirage Officiel</h2>
     <form id="form-tirage">
       <p>Saisissez le résultat du tirage :</p>
+      <p><label for="t-date">Date du tirage : </label>
+        <input type="date" id="t-date" style="width: auto;" required></p>
       <input type="number" id="t1" min="1" max="49" required>
       <input type="number" id="t2" min="1" max="49" required>
       <input type="number" id="t3" min="1" max="49" required>
