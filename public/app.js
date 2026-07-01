@@ -1,18 +1,55 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // Votre configuration Firebase (Plan Spark - Sans coût supplémentaire)
 const firebaseConfig = {
+  apiKey: "AIzaSyAuQGpeKrura990v7ifMUitfNieVLnNT-w",
+  authDomain: "lotostradamus-e09e6.firebaseapp.com",
   projectId: "lotostradamus-e09e6",
-  // Ajoutez votre apiKey, authDomain, etc., depuis les paramètres de votre projet dans la console Firebase
+  storageBucket: "lotostradamus-e09e6.firebasestorage.app",
+  messagingSenderId: "1096271499861",
+  appId: "1:1096271499861:web:02f6ea7d60c83e4db93adc",
+  measurementId: "G-PH0N6DHQKP"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // DOM Elements
 const formPronostic = document.getElementById("form-pronostic");
 const formTirage = document.getElementById("form-tirage");
+
+// --- Authentification (propriétaire) ---
+const zoneLogin = document.getElementById("zone-login");
+const zoneUser = document.getElementById("zone-user");
+const loginErreur = document.getElementById("login-erreur");
+
+document.getElementById("btn-login").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  loginErreur.innerText = "";
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    loginErreur.innerText = "Échec de la connexion : " + error.message;
+  }
+});
+
+document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
+
+// Réagit à l'état de connexion : affiche/masque les formulaires
+onAuthStateChanged(auth, (user) => {
+  const connecte = !!user;
+  zoneLogin.style.display = connecte ? "none" : "block";
+  zoneUser.style.display = connecte ? "block" : "none";
+  formPronostic.closest(".section").style.display = connecte ? "block" : "none";
+  formTirage.closest(".section").style.display = connecte ? "block" : "none";
+  if (connecte) {
+    document.getElementById("user-email").innerText = user.email;
+  }
+});
 
 // 1. Ajouter un pronostic
 formPronostic.addEventListener("submit", async (e) => {

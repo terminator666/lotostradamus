@@ -17,6 +17,24 @@
 
   <h1>🔮 LotosTradamus</h1>
 
+  <!-- 0. Connexion (propriétaire) -->
+  <div class="section" id="bloc-auth">
+    <!-- Affiché quand déconnecté -->
+    <div id="zone-login">
+      <h2>🔒 Connexion propriétaire</h2>
+      <p>Connecte-toi pour ajouter des pronostics et des tirages.</p>
+      <input type="email" id="login-email" placeholder="Email" aria-label="Email" style="width: 200px;">
+      <input type="password" id="login-password" placeholder="Mot de passe" aria-label="Mot de passe" style="width: 150px;">
+      <button id="btn-login">Se connecter</button>
+      <p id="login-erreur" style="color: red;"></p>
+    </div>
+    <!-- Affiché quand connecté -->
+    <div id="zone-user" style="display: none;">
+      <p>Connecté en tant que <strong id="user-email"></strong>
+        &nbsp; <button id="btn-logout" style="background-color: #6c757d;">Se déconnecter</button></p>
+    </div>
+  </div>
+
   <!-- 1. Saisie des Pronostics -->
   <div class="section">
     <h2>1. Enregistrer un Pronostic</h2>

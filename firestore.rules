@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Email du propriétaire autorisé à écrire.
+    // Pour changer de propriétaire, modifie cette valeur ET redéploie les règles.
+    function estProprietaire() {
+      return request.auth != null
+        && request.auth.token.email == 'choidongseo@gmail.com';
+    }
+
+    match /predictions/{document} {
+      allow read: if true;            // Stats visibles par tous
+      allow write: if estProprietaire();
+    }
+
+    match /tirages/{document} {
+      allow read: if true;
+      allow write: if estProprietaire();
+    }
+  }
+}
