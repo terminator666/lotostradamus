@@ -175,7 +175,11 @@ async function chargerPronostics() {
     return;
   }
 
-  let html = "<ul>";
+  let html = `<table>
+    <thead>
+      <tr><th>Date</th><th>Numéros</th><th>Chance</th><th>Statut</th></tr>
+    </thead>
+    <tbody>`;
   pronostics.forEach((data) => {
     let statut;
     if (!data.evalue) {
@@ -184,10 +188,14 @@ async function chargerPronostics() {
       const estGagnant = data.nbrMatch > 0 || data.chanceMatch;
       statut = `${estGagnant ? "✅" : "❌"} ${data.nbrMatch} numéro(s) + ${data.chanceMatch ? "chance trouvée" : "chance manquée"}`;
     }
-    html += `<li>Pronostic du ${new Date(data.date).toLocaleDateString()} :
-      [${data.numeros.join(", ")}] (Chance: ${data.chance}) — <strong>${statut}</strong></li>`;
+    html += `<tr>
+      <td>${new Date(data.date).toLocaleDateString()}</td>
+      <td>${data.numeros.join(", ")}</td>
+      <td>${data.chance}</td>
+      <td>${statut}</td>
+    </tr>`;
   });
-  html += "</ul>";
+  html += "</tbody></table>";
 
   document.getElementById("liste-pronostics").innerHTML = html;
 }
