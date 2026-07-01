@@ -126,6 +126,7 @@ formTirage.addEventListener("submit", async (e) => {
     formTirage.reset();
     chargerStats();
     chargerPronostics();
+    chargerTirages();
   } catch (error) {
     console.error("Erreur lors de l'évaluation : ", error);
   }
@@ -202,6 +203,37 @@ async function chargerPronostics() {
   document.getElementById("liste-pronostics").innerHTML = html;
 }
 
+// Afficher tous les tirages enregistrés
+async function chargerTirages() {
+  const querySnapshot = await getDocs(collection(db, "tirages"));
+
+  // Trier du plus récent au plus ancien
+  const tirages = querySnapshot.docs
+    .map((d) => d.data())
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (tirages.length === 0) {
+    document.getElementById("liste-tirages").innerHTML = "<p>Aucun tirage enregistré pour l'instant.</p>";
+    return;
+  }
+
+  let html = `<table>
+    <thead>
+      <tr><th>Date</th><th>Numéros</th><th>Chance</th></tr>
+    </thead>
+    <tbody>`;
+  tirages.forEach((data) => {
+    html += `<tr>
+      <td>${new Date(data.date).toLocaleDateString()}</td>
+      <td>${data.numeros.join(", ")}</td>
+      <td>${data.chance}</td>
+    </tr>`;
+  });
+  html += "</tbody></table>";
+
+  document.getElementById("liste-tirages").innerHTML = html;
+}
+
 // Pré-remplir les champs date avec la date du jour (format AAAA-MM-JJ)
 const aujourdhui = new Date().toISOString().slice(0, 10);
 document.getElementById("p-date").value = aujourdhui;
@@ -210,3 +242,4 @@ document.getElementById("t-date").value = aujourdhui;
 // Chargement initial
 chargerStats();
 chargerPronostics();
+chargerTirages();
