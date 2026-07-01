@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LotosTradamus - Pronostics Loto</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; }
+    .section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+    input[type="number"] { width: 50px; margin-right: 5px; padding: 5px; text-align: center; }
+    button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .chance { background-color: #ffe6e6; }
+    .stats { font-size: 1.2em; font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+
+  <h1>🔮 LotosTradamus</h1>
+
+  <!-- 1. Saisie des Pronostics -->
+  <div class="section">
+    <h2>1. Enregistrer un Pronostic</h2>
+    <form id="form-pronostic">
+      <p>Saisissez vos 5 numéros (1-49) et le numéro Chance (1-10) :</p>
+      <input type="number" id="p1" min="1" max="49" required>
+      <input type="number" id="p2" min="1" max="49" required>
+      <input type="number" id="p3" min="1" max="49" required>
+      <input type="number" id="p4" min="1" max="49" required>
+      <input type="number" id="p5" min="1" max="49" required>
+      <input type="number" id="pc" class="chance" min="1" max="10" placeholder="Chance" required>
+      <br><br>
+      <button type="submit">Enregistrer le Pronostic</button>
+    </form>
+  </div>
+
+  <!-- 2. Saisie du Tirage Réel -->
+  <div class="section">
+    <h2>2. Enregistrer le Tirage Officiel</h2>
+    <form id="form-tirage">
+      <p>Saisissez le résultat du tirage :</p>
+      <input type="number" id="t1" min="1" max="49" required>
+      <input type="number" id="t2" min="1" max="49" required>
+      <input type="number" id="t3" min="1" max="49" required>
+      <input type="number" id="t4" min="1" max="49" required>
+      <input type="number" id="t5" min="1" max="49" required>
+      <input type="number" id="tc" class="chance" min="1" max="10" placeholder="Chance" required>
+      <br><br>
+      <button type="submit" style="background-color: #28a745;">Valider le Tirage</button>
+    </form>
+  </div>
+
+  <!-- 3. Taux de Réussite et Historique -->
+  <div class="section">
+    <h2>3. Vos Statistiques</h2>
+    <p>Taux de réussite global (au moins 1 numéro ou chance trouvé) : <span id="taux-reussite" class="stats">--%</span></p>
+    <div id="historique"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
