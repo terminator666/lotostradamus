@@ -19,5 +19,16 @@ service cloud.firestore {
       allow read: if true;
       allow write: if estProprietaire();
     }
+
+    // Compteur de visiteurs : lisible par tous, incrémentable par tous
+    // mais uniquement de +1 sur le seul champ `count` (anti-abus).
+    match /stats/visiteurs {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+      allow update: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1;
+      allow delete: if false;
+    }
   }
 }

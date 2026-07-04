@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // Votre configuration Firebase (Plan Spark - Sans coût supplémentaire)
@@ -369,12 +369,32 @@ function editerTirage(tr, data) {
   });
 }
 
+// Compteur de visiteurs : incrémente une fois par session, puis affiche le total
+async function compteurVisiteurs() {
+  const ref = doc(db, "stats", "visiteurs");
+  const affichage = document.getElementById("compteur-visiteurs");
+  try {
+    // N'incrémenter qu'une seule fois par session de navigation
+    if (!sessionStorage.getItem("visiteur-compte")) {
+      await setDoc(ref, { count: increment(1) }, { merge: true });
+      sessionStorage.setItem("visiteur-compte", "1");
+    }
+    const snap = await getDoc(ref);
+    const total = snap.exists() ? snap.data().count : 0;
+    affichage.innerText = `👁️ ${total} visiteur${total > 1 ? "s" : ""}`;
+  } catch (error) {
+    console.error("Erreur du compteur de visiteurs : ", error);
+    affichage.style.display = "none";
+  }
+}
+
 // Pré-remplir les champs date avec la date du jour (format AAAA-MM-JJ)
 const aujourdhui = new Date().toISOString().slice(0, 10);
 document.getElementById("p-date").value = aujourdhui;
 document.getElementById("t-date").value = aujourdhui;
 
 // Chargement initial
+compteurVisiteurs();
 chargerStats();
 chargerPronostics();
 chargerTirages();
